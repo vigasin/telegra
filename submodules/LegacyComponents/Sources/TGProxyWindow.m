@@ -2,6 +2,7 @@
 #import <LegacyComponents/TGFont.h>
 
 #import "LegacyComponentsInternal.h"
+#import "UIWindow+TGWindowScene.h"
 #import <LegacyComponents/TGImageUtils.h>
 
 static UIImage *generateShieldImage(UIColor *color) {
@@ -255,6 +256,7 @@ static bool TGProxyWindowIsLight = true;
     self = [super initWithFrame:frame];
     if (self)
     {
+        [self tg_attachToActiveWindowScene];
         self.windowLevel = UIWindowLevelStatusBar;
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         

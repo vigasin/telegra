@@ -1,6 +1,7 @@
 #import <LegacyComponents/TGOverlayControllerWindow.h>
 
 #import "LegacyComponentsInternal.h"
+#import "UIWindow+TGWindowScene.h"
 #import <LegacyComponents/TGHacks.h>
 
 #import <LegacyComponents/TGViewController.h>
@@ -142,6 +143,7 @@
     self = [super initWithFrame:[[_manager context] fullscreenBounds]];
     if (self != nil)
     {
+        [self tg_attachToActiveWindowScene];
         self.frame = [[_manager context] fullscreenBounds];
         self.windowLevel = UIWindowLevelStatusBar - 0.001f;
         

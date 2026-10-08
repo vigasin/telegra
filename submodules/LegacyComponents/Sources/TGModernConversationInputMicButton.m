@@ -1,6 +1,7 @@
 #import <LegacyComponents/TGModernConversationInputMicButton.h>
 
 #import "LegacyComponentsInternal.h"
+#import "UIWindow+TGWindowScene.h"
 
 #import <LegacyComponents/TGModernButton.h>
 #import <LegacyComponents/TGOverlayController.h>
@@ -74,6 +75,7 @@ static const CGFloat outerCircleMinScale = innerCircleRadius / outerCircleRadius
     self = [super init];
     if (self != nil) {
         _overlayWindow = [[TGModernConversationInputMicWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        [_overlayWindow tg_attachToActiveWindowScene];
         _overlayWindow.windowLevel = 1000000000.0f;
         _overlayWindow.rootViewController = [[TGModernConversationInputMicButtonOverlayController alloc] init];
     }

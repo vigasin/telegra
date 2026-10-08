@@ -1,6 +1,7 @@
 #import "TGOverlayFormsheetWindow.h"
 
 #import "LegacyComponentsInternal.h"
+#import "UIWindow+TGWindowScene.h"
 #import <LegacyComponents/TGViewController.h>
 
 #import "TGOverlayFormsheetController.h"
@@ -26,6 +27,7 @@
     self = [super initWithFrame:[[manager context] fullscreenBounds]];
     if (self != nil)
     {
+        [self tg_attachToActiveWindowScene];
         _manager = manager;
         self.windowLevel = parentController.view.window.windowLevel + 0.0001f;
         self.backgroundColor = [UIColor clearColor];

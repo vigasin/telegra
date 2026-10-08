@@ -87,10 +87,15 @@ private func isKeyboardViewContainer(view: NSObject) -> Bool {
 }
 
 private class ApplicationStatusBarHost: StatusBarHost {
-    private weak var scene: UIWindowScene?
+    // The window is attached to its scene only after the scene connects (see SceneDelegate).
+    private weak var window: UIWindow?
     
-    init(scene: UIWindowScene?) {
-        self.scene = scene
+    private var scene: UIWindowScene? {
+        return self.window?.windowScene
+    }
+    
+    init(window: UIWindow) {
+        self.window = window
     }
     
     var isApplicationInForeground: Bool {
@@ -119,7 +124,15 @@ private class ApplicationStatusBarHost: StatusBarHost {
     }
     
     var keyboardWindow: UIWindow? {
-        if #available(iOS 16.0, *) {
+        if #available(iOS 27.0, *) {
+            // iOS 27 traps on direct calls to +[UIRemoteKeyboardWindow remoteKeyboardWindowForScreen:create:].
+            for window in self.scene?.windows ?? [] {
+                if isKeyboardWindow(window: window) {
+                    return window
+                }
+            }
+            return nil
+        } else if #available(iOS 16.0, *) {
             return UIApplication.shared.internalGetKeyboard()
         }
         
@@ -395,7 +408,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         }
         
         let (window, hostView) = nativeWindowHostView()
-        let statusBarHost = ApplicationStatusBarHost(scene: window.windowScene)
+        let statusBarHost = ApplicationStatusBarHost(window: window)
         self.mainWindow = Window1(hostView: hostView, statusBarHost: statusBarHost)
         if let traitCollection = window.rootViewController?.traitCollection {
             if #available(iOS 13.0, *) {

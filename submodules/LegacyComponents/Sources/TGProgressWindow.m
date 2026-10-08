@@ -1,6 +1,7 @@
 #import <LegacyComponents/TGProgressWindow.h>
 
 #import "LegacyComponentsInternal.h"
+#import "UIWindow+TGWindowScene.h"
 
 #import <LegacyComponents/TGProgressSpinnerView.h>
 
@@ -270,6 +271,7 @@ static bool TGProgressWindowIsLight = true;
     self = [super initWithFrame:frame];
     if (self)
     {
+        [self tg_attachToActiveWindowScene];
         self.windowLevel = UIWindowLevelStatusBar;
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
