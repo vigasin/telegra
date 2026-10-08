@@ -84,3 +84,7 @@ xcode-files
 **/node_modules/
 tools/sim-watcher/dist/
 .mcp.json
+
+# Local Telegra build configuration (contains api_id/api_hash)
+telegra-configuration.json
+/bazel-telegra
