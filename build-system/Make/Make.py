@@ -221,6 +221,31 @@ class BazelCommandLine:
         print('TelegramBuild: running {}'.format(combined_arguments))
         call_executable(combined_arguments)
 
+    def write_warnings_as_errors_override(self, disable_warnings_as_errors):
+        # Imported from .bazelrc via try-import. Target copts come after --copt/--swiftcopt,
+        # so the override uses --per_file_copt and --per_module_swiftcopt, which are appended last.
+        # --per_module_swiftcopt only accepts exact labels, hence the query.
+        rc_path = '{}/build-input/no-warnings-as-errors.bazelrc'.format(self.build_environment.base_path)
+        if not disable_warnings_as_errors:
+            if os.path.exists(rc_path):
+                os.remove(rc_path)
+            return
+
+        query_arguments = [self.build_environment.bazel_path]
+        query_arguments += self.get_startup_bazel_arguments()
+        query_arguments += ['query', '--keep_going', 'attr(copts, "-warnings-as-errors", kind(swift_library, //...))']
+        query_result = subprocess.run(query_arguments, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+        labels = [line.strip() for line in query_result.stdout.splitlines() if line.startswith('//')]
+        if len(labels) == 0:
+            print('TelegramBuild: could not query swift_library targets for --noWarningsAsErrors')
+            sys.exit(1)
+
+        with open(rc_path, 'w') as file:
+            file.write('build --per_file_copt=.*@-Wno-error\n')
+            for label in labels:
+                # Canonical '@@//' form: rules_swift parses the label relative to its own repository.
+                file.write('build --@build_bazel_rules_swift//swift:per_module_swiftcopt=@@{}=-no-warnings-as-errors\n'.format(label))
+
     def get_define_arguments(self):
         args = [
             '--define=buildNumber={}'.format(self.build_number),
@@ -692,6 +717,9 @@ def build(bazel, arguments):
             )
         else:
             print('TelegramBuild: warning: --embedWatchApp requires a device configuration (debug_arm64 or release_arm64); ignored for simulator builds.')
+    if arguments.disableProvisioningProfiles:
+        bazel_command_line.set_disable_provisioning_profiles()
+    bazel_command_line.write_warnings_as_errors_override(arguments.noWarningsAsErrors)
     bazel_command_line.set_build_number(arguments.buildNumber)
     bazel_command_line.set_custom_target(arguments.target)
     bazel_command_line.set_continue_on_error(arguments.continueOnError)
@@ -1131,6 +1159,23 @@ if __name__ == '__main__':
         type=str,
         help='Absolute path to the watchkitapp .mobileprovision file.',
         metavar='path'
+    )
+    buildParser.add_argument(
+        '--disableProvisioningProfiles',
+        action='store_true',
+        default=False,
+        help='''
+            This allows to build the app for simulator without having any provisioning profiles.
+            Building for an actual device will fail.
+            '''
+    )
+    buildParser.add_argument(
+        '--noWarningsAsErrors',
+        action='store_true',
+        default=False,
+        help='''
+            Do not treat compiler warnings as errors. Needed when building with a newer Xcode than versions.json specifies.
+            '''
     )
 
     remote_build_parser = subparsers.add_parser('remote-build', help='Build the app using a remote environment.')
