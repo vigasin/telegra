@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024px" height="1024px" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Bubble</title>
+    <g id="Bubble" stroke="none" fill="none" fill-rule="nonzero">
+        <path d="M282,490 A230,180 0 1,1 742,490 A230,180 0 1,1 282,490 Z M360,590 L440,640 L320,730 Z M374,490 A38,38 0 1,0 450,490 A38,38 0 1,0 374,490 Z M474,490 A38,38 0 1,0 550,490 A38,38 0 1,0 474,490 Z M574,490 A38,38 0 1,0 650,490 A38,38 0 1,0 574,490 Z" id="Bubble-Path" fill="#FFFFFF"></path>
+    </g>
+</svg>
